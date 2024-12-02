@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const albumsContainer = document.getElementById('albums');
             const audioPlayer = document.getElementById('audio-player');
             const currentTrackDisplay = document.getElementById('current-track');
+            const trackListContainer = document.querySelector('.track-list');
             let currentTrackIndex = -1;
             let currentAlbumTracks = [];
 
@@ -29,6 +30,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         audioURL: `music/${albumName}/${track}`
                     }));
                     loadTrackList();
+
+                    // Check if on mobile, then scroll to track section
+                    if (window.innerWidth <= 768) {
+                        const trackSection = document.getElementById('player');
+                        trackSection.scrollIntoView({ behavior: 'smooth' });
+                    }
                 });
 
                 // Append the album card to the albums container
@@ -37,9 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Function to load the track list for a specific album
             function loadTrackList() {
-                const trackListContainer = document.createElement('div');
-                trackListContainer.classList.add('track-list');
-                trackListContainer.innerHTML = '';
+                trackListContainer.innerHTML = ''; // Clear existing tracks
 
                 currentAlbumTracks.forEach((track, index) => {
                     const trackButton = document.createElement('button');
@@ -47,15 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     trackButton.addEventListener('click', () => playTrack(index));
                     trackListContainer.appendChild(trackButton);
                 });
-
-                // If there's an existing track list, remove it and add the new one
-                const existingTrackList = document.querySelector('.track-list');
-                if (existingTrackList) {
-                    existingTrackList.remove();
-                }
-
-                // Add the new track list to the player section
-                document.getElementById('player').appendChild(trackListContainer);
             }
 
             // Function to play a track by its index
