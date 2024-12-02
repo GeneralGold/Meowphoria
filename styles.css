@@ -1,0 +1,75 @@
+body {
+  background-color: #060c21;
+  font-family: Arial, sans-serif;
+  color: white;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+#player-container {
+  text-align: center;
+}
+
+#playlist-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.album {
+  display: inline-block;
+  margin: 10px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.album-cover {
+  width: 120px;
+  height: 120px;
+  border-radius: 5px;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.album-cover:hover {
+  transform: scale(1.1);
+}
+
+.album h3 {
+  margin: 5px 0;
+  font-size: 16px;
+  color: white;
+}
+
+#player-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #1e90ff;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #005fa3;
+}
+
+audio {
+  margin-top: 10px;
+  width: 100%;
+  max-width: 400px;
+}
