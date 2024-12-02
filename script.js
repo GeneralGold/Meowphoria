@@ -1,102 +1,87 @@
-const audioPlayer = document.getElementById("audio-player");
-const playButton = document.getElementById("play");
-const nextButton = document.getElementById("next");
-const prevButton = document.getElementById("prev");
-const playlistContainer = document.getElementById("playlist-container");
+// Wait until the DOM is fully loaded
+document.addEventListener("DOMContentLoaded", () => {
+    // Fetch the playlist.json file to get album data
+    fetch('playlist.json')
+        .then(response => response.json())
+        .then(data => {
+            const albumsContainer = document.getElementById('albums');
+            const audioPlayer = document.getElementById('audio-player');
+            const currentTrackDisplay = document.getElementById('current-track');
+            let currentTrackIndex = -1;
+            let currentAlbumTracks = [];
 
-let currentAlbum = null;
-let currentTrackIndex = 0;
-let playlist = {};
+            // Create an album card for each album in the playlist
+            Object.keys(data).forEach(albumName => {
+                const album = data[albumName];
 
-// Load playlist from playlist.json
-async function loadPlaylist() {
-  try {
-    const response = await fetch("playlist.json");
-    playlist = await response.json();
-    renderAlbums();
-  } catch (error) {
-    console.error("Error loading playlist:", error);
-  }
-}
+                // Create an album card element
+                const albumCard = document.createElement('div');
+                albumCard.classList.add('album-card');
+                albumCard.innerHTML = `
+                    <img src="${album.cover || 'default-cover.jpg'}" alt="${albumName}">
+                    <h3>${albumName}</h3>
+                `;
 
-// Render albums on the page
-function renderAlbums() {
-  playlistContainer.innerHTML = "";
-  for (const album in playlist) {
-    const albumData = playlist[album];
+                // Add event listener to load tracks when the album card is clicked
+                albumCard.addEventListener('click', () => {
+                    currentAlbumTracks = album.tracks.map(track => ({
+                        name: track,
+                        audioURL: `music/${albumName}/${track}`
+                    }));
+                    loadTrackList();
+                });
 
-    // Album Container
-    const albumElement = document.createElement("div");
-    albumElement.className = "album";
+                // Append the album card to the albums container
+                albumsContainer.appendChild(albumCard);
+            });
 
-    // Album Cover
-    const cover = document.createElement("img");
-    cover.src = albumData.cover || "default-cover.jpg"; // Use a default image if no cover is found
-    cover.alt = `${album} Cover`;
-    cover.className = "album-cover";
+            // Function to load the track list for a specific album
+            function loadTrackList() {
+                const trackListContainer = document.createElement('div');
+                trackListContainer.classList.add('track-list');
+                trackListContainer.innerHTML = '';
 
-    // Album Title
-    const title = document.createElement("h3");
-    title.textContent = album;
+                currentAlbumTracks.forEach((track, index) => {
+                    const trackButton = document.createElement('button');
+                    trackButton.textContent = track.name;
+                    trackButton.addEventListener('click', () => playTrack(index));
+                    trackListContainer.appendChild(trackButton);
+                });
 
-    // Add click event to display tracks
-    albumElement.onclick = () => renderTracks(album);
+                // If there's an existing track list, remove it and add the new one
+                const existingTrackList = document.querySelector('.track-list');
+                if (existingTrackList) {
+                    existingTrackList.remove();
+                }
 
-    albumElement.appendChild(cover);
-    albumElement.appendChild(title);
-    playlistContainer.appendChild(albumElement);
-  }
-}
+                // Add the new track list to the player section
+                document.getElementById('player').appendChild(trackListContainer);
+            }
 
-// Render tracks for a selected album
-function renderTracks(album) {
-  currentAlbum = album;
-  playlistContainer.innerHTML = `<h2>${album}</h2>`;
-  playlist[album].tracks.forEach((track, index) => {
-    const trackElement = document.createElement("div");
-    trackElement.textContent = track;
-    trackElement.className = "track";
-    trackElement.onclick = () => playTrack(album, index);
-    playlistContainer.appendChild(trackElement);
-  });
+            // Function to play a track by its index
+            function playTrack(index) {
+                if (index < 0 || index >= currentAlbumTracks.length) return;
 
-  // Add a back button to return to the album list
-  const backButton = document.createElement("button");
-  backButton.textContent = "Back to Albums";
-  backButton.onclick = renderAlbums;
-  playlistContainer.appendChild(backButton);
-}
+                currentTrackIndex = index;
+                audioPlayer.src = currentAlbumTracks[currentTrackIndex].audioURL;
+                currentTrackDisplay.textContent = currentAlbumTracks[currentTrackIndex].name;
+                audioPlayer.play();
+            }
 
-// Play the selected track
-function playTrack(album, index) {
-  currentAlbum = album;
-  currentTrackIndex = index;
-  audioPlayer.src = `music/${album}/${playlist[album].tracks[index]}`;
-  audioPlayer.play();
-}
+            // Add event listeners for next and previous track buttons
+            document.getElementById('prev-track').addEventListener('click', () => {
+                if (currentTrackIndex > 0) {
+                    playTrack(currentTrackIndex - 1);
+                }
+            });
 
-// Control Buttons
-playButton.addEventListener("click", () => {
-  if (audioPlayer.paused) {
-    audioPlayer.play();
-    playButton.textContent = "Pause";
-  } else {
-    audioPlayer.pause();
-    playButton.textContent = "Play";
-  }
+            document.getElementById('next-track').addEventListener('click', () => {
+                if (currentTrackIndex < currentAlbumTracks.length - 1) {
+                    playTrack(currentTrackIndex + 1);
+                }
+            });
+        })
+        .catch(error => {
+            console.error("Error loading playlist:", error);
+        });
 });
-
-nextButton.addEventListener("click", () => {
-  if (!currentAlbum) return;
-  currentTrackIndex = (currentTrackIndex + 1) % playlist[currentAlbum].tracks.length;
-  playTrack(currentAlbum, currentTrackIndex);
-});
-
-prevButton.addEventListener("click", () => {
-  if (!currentAlbum) return;
-  currentTrackIndex = (currentTrackIndex - 1 + playlist[currentAlbum].tracks.length) % playlist[currentAlbum].tracks.length;
-  playTrack(currentAlbum, currentTrackIndex);
-});
-
-// Load playlist on page load
-loadPlaylist();
