@@ -1,83 +1,155 @@
-// Wait until the DOM is fully loaded
-document.addEventListener("DOMContentLoaded", () => {
-    // Fetch the playlist.json file to get album data
-    fetch('playlist.json')
-        .then(response => response.json())
-        .then(data => {
-            const albumsContainer = document.getElementById('albums');
-            const audioPlayer = document.getElementById('audio-player');
-            const currentTrackDisplay = document.getElementById('current-track');
-            const trackListContainer = document.querySelector('.track-list');
-            let currentTrackIndex = -1;
-            let currentAlbumTracks = [];
+// DOM Elements
+const audio = document.getElementById('audio');
+const playPauseButton = document.getElementById('play-pause');
+const prevButton = document.getElementById('prev');
+const nextButton = document.getElementById('next');
+const shuffleButton = document.getElementById('shuffle');
+const loopButton = document.getElementById('loop');
+const seekBar = document.getElementById('seek-bar');
+const currentTimeDisplay = document.getElementById('current-time');
+const durationDisplay = document.getElementById('duration');
+const trackList = document.getElementById('track-list');
+const uploadTrack = document.getElementById('upload-track');
+const playlistsDiv = document.getElementById('playlists');
+const newPlaylistButton = document.getElementById('new-playlist');
+const logo = document.getElementById('meowphoria-logo');
 
-            // Create an album card for each album in the playlist
-            Object.keys(data).forEach(albumName => {
-                const album = data[albumName];
+let playlists = JSON.parse(localStorage.getItem('playlists')) || {};
+let currentPlaylist = null;
+let currentTrackIndex = 0;
+let isPlaying = false;
+let isShuffle = false;
+let isLoop = false;
 
-                // Create an album card element
-                const albumCard = document.createElement('div');
-                albumCard.classList.add('album-card');
-                albumCard.innerHTML = `
-                    <img src="${album.cover || 'default-cover.jpg'}" alt="${albumName}">
-                    <h3>${albumName}</h3>
-                `;
+// Utility Functions
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
+    return `${minutes}:${secs}`;
+}
 
-                // Add event listener to load tracks when the album card is clicked
-                albumCard.addEventListener('click', () => {
-                    currentAlbumTracks = album.tracks.map(track => ({
-                        name: track,
-                        audioURL: `music/${albumName}/${track}`
-                    }));
-                    loadTrackList();
-
-                    // Check if on mobile, then scroll to track section
-                    if (window.innerWidth <= 768) {
-                        const trackSection = document.getElementById('player');
-                        trackSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                });
-
-                // Append the album card to the albums container
-                albumsContainer.appendChild(albumCard);
-            });
-
-            // Function to load the track list for a specific album
-            function loadTrackList() {
-                trackListContainer.innerHTML = ''; // Clear existing tracks
-
-                currentAlbumTracks.forEach((track, index) => {
-                    const trackButton = document.createElement('button');
-                    trackButton.textContent = track.name;
-                    trackButton.addEventListener('click', () => playTrack(index));
-                    trackListContainer.appendChild(trackButton);
-                });
-            }
-
-            // Function to play a track by its index
-            function playTrack(index) {
-                if (index < 0 || index >= currentAlbumTracks.length) return;
-
-                currentTrackIndex = index;
-                audioPlayer.src = currentAlbumTracks[currentTrackIndex].audioURL;
-                currentTrackDisplay.textContent = currentAlbumTracks[currentTrackIndex].name;
-                audioPlayer.play();
-            }
-
-            // Add event listeners for next and previous track buttons
-            document.getElementById('prev-track').addEventListener('click', () => {
-                if (currentTrackIndex > 0) {
-                    playTrack(currentTrackIndex - 1);
-                }
-            });
-
-            document.getElementById('next-track').addEventListener('click', () => {
-                if (currentTrackIndex < currentAlbumTracks.length - 1) {
-                    playTrack(currentTrackIndex + 1);
-                }
-            });
-        })
-        .catch(error => {
-            console.error("Error loading playlist:", error);
+function updateTrackList() {
+    trackList.innerHTML = '';
+    if (currentPlaylist && playlists[currentPlaylist]) {
+        playlists[currentPlaylist].forEach((track, index) => {
+            const li = document.createElement('li');
+            li.textContent = track.name;
+            li.addEventListener('click', () => playTrack(index));
+            trackList.appendChild(li);
         });
+    }
+}
+
+function savePlaylists() {
+    localStorage.setItem('playlists', JSON.stringify(playlists));
+}
+
+// Playlist Management
+newPlaylistButton.addEventListener('click', () => {
+    const name = prompt('Enter playlist name:');
+    if (name) {
+        playlists[name] = [];
+        currentPlaylist = name;
+        savePlaylists();
+        updatePlaylistUI();
+    }
+});
+
+function updatePlaylistUI() {
+    playlistsDiv.innerHTML = '';
+    Object.keys(playlists).forEach((name) => {
+        const button = document.createElement('button');
+        button.textContent = name;
+        button.addEventListener('click', () => {
+            currentPlaylist = name;
+            updateTrackList();
+        });
+        playlistsDiv.appendChild(button);
+    });
+}
+
+updatePlaylistUI();
+
+// Audio Player Controls
+playPauseButton.addEventListener('click', () => {
+    if (isPlaying) {
+        audio.pause();
+        playPauseButton.textContent = '▶';
+    } else {
+        audio.play();
+        playPauseButton.textContent = '⏸';
+    }
+    isPlaying = !isPlaying;
+});
+
+audio.addEventListener('timeupdate', () => {
+    seekBar.value = (audio.currentTime / audio.duration) * 100;
+    currentTimeDisplay.textContent = formatTime(audio.currentTime);
+});
+
+seekBar.addEventListener('input', () => {
+    audio.currentTime = (seekBar.value / 100) * audio.duration;
+});
+
+audio.addEventListener('ended', () => {
+    if (isLoop) {
+        audio.currentTime = 0;
+        audio.play();
+    } else if (isShuffle) {
+        currentTrackIndex = Math.floor(Math.random() * playlists[currentPlaylist].length);
+        playTrack(currentTrackIndex);
+    } else {
+        nextTrack();
+    }
+});
+
+prevButton.addEventListener('click', () => {
+    currentTrackIndex = (currentTrackIndex - 1 + playlists[currentPlaylist].length) % playlists[currentPlaylist].length;
+    playTrack(currentTrackIndex);
+});
+
+nextButton.addEventListener('click', nextTrack);
+
+function nextTrack() {
+    currentTrackIndex = (currentTrackIndex + 1) % playlists[currentPlaylist].length;
+    playTrack(currentTrackIndex);
+}
+
+shuffleButton.addEventListener('click', () => {
+    isShuffle = !isShuffle;
+    shuffleButton.style.background = isShuffle ? '#007acc' : '';
+});
+
+loopButton.addEventListener('click', () => {
+    isLoop = !isLoop;
+    loopButton.style.background = isLoop ? '#007acc' : '';
+});
+
+// Track Upload
+uploadTrack.addEventListener('change', (event) => {
+    const files = Array.from(event.target.files);
+    if (currentPlaylist) {
+        files.forEach(file => playlists[currentPlaylist].push({ name: file.name, url: URL.createObjectURL(file) }));
+        savePlaylists();
+        updateTrackList();
+    } else {
+        alert('Please select or create a playlist first.');
+    }
+});
+
+// Play Track
+function playTrack(index) {
+    currentTrackIndex = index;
+    const track = playlists[currentPlaylist][index];
+    if (track) {
+        audio.src = track.url;
+        audio.play();
+        playPauseButton.textContent = '⏸';
+        isPlaying = true;
+    }
+}
+
+// Logo click navigation
+logo.addEventListener('click', () => {
+    window.open('https://generalgoldyt.com', '_blank');
 });
