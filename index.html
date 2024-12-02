@@ -12,33 +12,41 @@
             <img id="meowphoria-logo" src="https://generalgoldyt.com/webhook/GeneralGoldLogo.png" alt="Meowphoria Logo">
         </div>
         <h1>Meowphoria Music Player</h1>
-        <p>Experience music like never before!</p>
     </header>
 
     <main>
         <!-- Audio Player Section -->
-        <div class="player">
-            <button id="prev" title="Previous Track">⏮</button>
-            <button id="play-pause" title="Play/Pause">▶</button>
-            <button id="next" title="Next Track">⏭</button>
-            <button id="shuffle" title="Shuffle">🔀</button>
-            <button id="loop" title="Loop">🔁</button>
-            <span id="current-time">0:00</span> / <span id="duration">0:00</span>
-            <input type="range" id="seek-bar" value="0" title="Seek">
+        <div class="audio-player">
+            <div class="player-controls">
+                <button id="prev">⏮</button>
+                <button id="play-pause">▶</button>
+                <button id="next">⏭</button>
+                <button id="shuffle">🔀</button>
+                <button id="loop">🔁</button>
+            </div>
+            <div id="current-track">Select a track to play</div>
+            <div class="progress-container">
+                <span id="current-time">0:00</span> / <span id="duration">0:00</span>
+                <input type="range" id="seek-bar" value="0" />
+            </div>
         </div>
 
-        <!-- Playlist Management Section -->
+        <!-- Album Grid Section -->
+        <section class="album-grid" id="album-grid">
+            <!-- Albums will be dynamically loaded here -->
+        </section>
+
+        <!-- Playlist Manager Section -->
         <section class="playlist-manager">
             <h2>Your Playlists</h2>
             <div id="playlists"></div>
             <button id="new-playlist">Create New Playlist</button>
         </section>
 
-        <!-- Track Management Section -->
+        <!-- Track Manager Section -->
         <section class="track-manager">
             <h2>Tracks</h2>
             <ul id="track-list"></ul>
-            <input type="file" id="upload-track" accept="audio/*" multiple>
         </section>
     </main>
 
