@@ -33,6 +33,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         audioURL: `music/${albumName}/${track}`
                     }));
                     loadTrackList();
+
+                    // Check if on mobile (screen width <= 768px), then scroll to the track section
+                    if (window.innerWidth <= 768) {
+                        const trackSection = document.getElementById('player');
+                        trackSection.scrollIntoView({ behavior: 'smooth' });  // Smooth scroll to the track section
+                    }
                 });
 
                 // Append the album card to the albums container
