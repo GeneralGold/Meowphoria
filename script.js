@@ -1,118 +1,122 @@
-document.addEventListener("DOMContentLoaded", function () {
-    // Fetch the playlist data from the JSON file
+document.addEventListener("DOMContentLoaded", () => {
+    // Fetch the playlist.json file to get album data
     fetch('playlist.json')
         .then(response => response.json())
         .then(data => {
-            generateAlbums(data);
-        });
+            const albumsContainer = document.getElementById('albums');
+            const audioPlayer = document.getElementById('audio-player');
+            const currentTrackDisplay = document.getElementById('current-track');
+            const trackListContainer = document.querySelector('.track-list');
+            const queueList = document.getElementById('queue-list');
+            const shuffleButton = document.getElementById('shuffle-btn');
+            let currentTrackIndex = -1;
+            let currentAlbumTracks = [];
+            let queue = [];
+            let isShuffled = false;
 
-    // Function to generate album grid
-    function generateAlbums(data) {
-        const albumGrid = document.getElementById("album-grid");
+            // Create an album card for each album in the playlist
+            Object.keys(data).forEach(albumName => {
+                const album = data[albumName];
 
-        // Loop through each album in the JSON data
-        for (let albumName in data) {
-            const album = data[albumName];
-            const albumCard = document.createElement("div");
-            albumCard.classList.add("album-card");
-            albumCard.dataset.albumName = albumName;
+                // Create an album card element
+                const albumCard = document.createElement('div');
+                albumCard.classList.add('album-card');
+                albumCard.innerHTML = `
+                    <img src="${album.cover || 'default-cover.jpg'}" alt="${albumName}">
+                    <h3>${albumName}</h3>
+                `;
 
-            // Create album cover
-            const albumCover = document.createElement("img");
-            albumCover.src = album.cover;
-            albumCover.alt = `${albumName} Cover`;
+                // Add event listener to load tracks when the album card is clicked
+                albumCard.addEventListener('click', () => {
+                    currentAlbumTracks = album.tracks.map(track => ({
+                        name: track,
+                        audioURL: `music/${albumName}/${track}`
+                    }));
+                    loadTrackList();
+                });
 
-            // Album name
-            const albumTitle = document.createElement("h3");
-            albumTitle.textContent = albumName;
-
-            // Add cover and title to the album card
-            albumCard.appendChild(albumCover);
-            albumCard.appendChild(albumTitle);
-
-            // Add click event to show tracks when clicked
-            albumCard.addEventListener("click", function () {
-                showTracks(albumName, album.tracks);
+                // Append the album card to the albums container
+                albumsContainer.appendChild(albumCard);
             });
 
-            // Append album card to album grid
-            albumGrid.appendChild(albumCard);
-        }
-    }
-
-    // Function to display the tracks of an album when it's clicked
-    function showTracks(albumName, tracks) {
-        const trackList = document.getElementById("track-list");
-        trackList.innerHTML = ''; // Clear existing tracks
-
-        // Set current album name
-        document.getElementById("current-track").textContent = `Playing from: ${albumName}`;
-
-        // Loop through the tracks and add them to the track list
-        tracks.forEach(track => {
-            const trackItem = document.createElement("li");
-            trackItem.textContent = track;
-
-            // Add click event to load track into the player when clicked
-            trackItem.addEventListener("click", function () {
-                playTrack(albumName, track);
-            });
-
-            trackList.appendChild(trackItem);
-        });
-    }
-
-    // Function to play the selected track
-    function playTrack(albumName, track) {
-        const audioPlayer = document.getElementById("audio");
-        const trackUrl = `music/${albumName}/${track}`;
-
-        // Set the source of the audio player
-        audioPlayer.src = trackUrl;
-
-        // Update the current track info
-        document.getElementById("current-track").textContent = `Now playing: ${track}`;
-
-        // Play the track
-        audioPlayer.play();
-
-        // Update the track's duration and time during playback
-        audioPlayer.addEventListener("loadedmetadata", function () {
-            document.getElementById("duration").textContent = formatTime(audioPlayer.duration);
-        });
-
-        // Update current time
-        audioPlayer.addEventListener("timeupdate", function () {
-            document.getElementById("current-time").textContent = formatTime(audioPlayer.currentTime);
-            document.getElementById("seek-bar").value = (audioPlayer.currentTime / audioPlayer.duration) * 100;
-        });
-
-        // Play/pause functionality
-        document.getElementById("play-pause").addEventListener("click", function () {
-            if (audioPlayer.paused) {
-                audioPlayer.play();
-            } else {
-                audioPlayer.pause();
+            // Function to load the track list for a specific album
+            function loadTrackList() {
+                trackListContainer.innerHTML = ''; // Clear existing tracks
+                currentAlbumTracks.forEach((track, index) => {
+                    const trackButton = document.createElement('button');
+                    trackButton.textContent = track.name;
+                    trackButton.addEventListener('click', () => addToQueue(track));
+                    trackListContainer.appendChild(trackButton);
+                });
             }
+
+            // Function to add a track to the queue
+            function addToQueue(track) {
+                queue.push(track);
+                renderQueue();
+            }
+
+            // Function to render the queue in the queue section
+            function renderQueue() {
+                queueList.innerHTML = '';
+                queue.forEach((track, index) => {
+                    const li = document.createElement('li');
+                    li.textContent = track.name;
+                    const removeBtn = document.createElement('button');
+                    removeBtn.textContent = 'Remove';
+                    removeBtn.addEventListener('click', () => removeFromQueue(index));
+                    li.appendChild(removeBtn);
+                    if (index === 0 && !audioPlayer.paused) {
+                        li.classList.add('playing');
+                    }
+                    queueList.appendChild(li);
+                });
+            }
+
+            // Function to remove a track from the queue
+            function removeFromQueue(index) {
+                queue.splice(index, 1);
+                renderQueue();
+                if (index === 0 && !audioPlayer.paused) {
+                    playNext();
+                }
+            }
+
+            // Function to shuffle the queue
+            function shuffleQueue() {
+                for (let i = queue.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [queue[i], queue[j]] = [queue[j], queue[i]];
+                }
+                isShuffled = true;
+                renderQueue();
+            }
+
+            // Play the next track in the queue
+            function playNext() {
+                if (queue.length > 0) {
+                    const track = queue.shift();
+                    currentTrackDisplay.textContent = track.name;
+                    audioPlayer.src = track.audioURL;
+                    audioPlayer.play();
+                    renderQueue();
+                }
+            }
+
+            // Add event listeners for next and previous track buttons
+            document.getElementById('prev-track').addEventListener('click', () => {
+                if (currentTrackIndex > 0) {
+                    playTrack(currentTrackIndex - 1);
+                }
+            });
+
+            document.getElementById('next-track').addEventListener('click', playNext);
+
+            shuffleButton.addEventListener('click', shuffleQueue);
+
+            audioPlayer.addEventListener('ended', playNext);
+        })
+        .catch(error => {
+            console.error("Error loading playlist:", error);
         });
-
-        // Seekbar functionality
-        document.getElementById("seek-bar").addEventListener("input", function (event) {
-            const seekTime = (event.target.value / 100) * audioPlayer.duration;
-            audioPlayer.currentTime = seekTime;
-        });
-    }
-
-    // Helper function to format time in minutes:seconds
-    function formatTime(seconds) {
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-    }
-
-    // Make logo open the website https://generalgoldyt.com in a new tab when clicked
-    const logo = document.getElementById("meowphoria-logo");
-    logo.addEventListener("click", function () {
-        window.open("https://generalgoldyt.com", "_blank");
-    });
 });
