@@ -1,7 +1,8 @@
-/* General Styles */
+/* General Page Styles */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    background-color: #060c21; /* Dark background color */
+    color: white; /* Light text for contrast */
     margin: 0;
     padding: 0;
 }
@@ -9,134 +10,155 @@ body {
 header {
     text-align: center;
     padding: 20px;
-    background-color: #222;
-    color: #fff;
+    position: relative;
 }
 
-header .logo img {
-    cursor: pointer;
+header h1 {
+    margin: 10px 0;
+    font-size: 2rem;
 }
 
-h1 {
-    font-size: 2.5rem;
+header p {
+    margin: 5px 0;
+    font-size: 1.2rem;
+    color: #aaa;
 }
 
-/* Album Grid */
-.album-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
+/* Logo Styling */
+.logo img {
+    max-width: 200px; /* Limit the logo size */
+    height: auto;
+    cursor: pointer; /* Indicates that the logo is clickable */
+    transition: transform 0.3s ease;
+}
+
+.logo img:hover {
+    transform: scale(1.1); /* Slightly enlarge logo on hover */
+}
+
+/* Album Grid and Track Management */
+#album-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
     padding: 20px;
 }
 
 .album-card {
-    width: 200px;
-    margin: 10px;
+    background-color: #1a2332;
+    border-radius: 10px;
     padding: 10px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
     text-align: center;
-    transition: transform 0.2s;
+    cursor: pointer;
+    transition: transform 0.3s ease;
 }
 
 .album-card:hover {
-    transform: scale(1.05);
+    transform: scale(1.05); /* Slight scale on hover */
 }
 
 .album-card img {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 8px;
+    max-width: 100%;
+    border-radius: 10px;
 }
 
 .album-card h3 {
-    font-size: 1.2rem;
-    color: #333;
+    font-size: 1.1rem;
+    color: #ddd;
 }
 
-/* Track Manager */
-.track-manager {
-    margin: 20px;
-}
-
-ul {
+/* Track Management */
+#track-list {
     list-style-type: none;
     padding: 0;
 }
 
-li {
+#track-list li {
+    padding: 8px;
+    background-color: #1a2332;
+    margin: 5px 0;
+    border-radius: 5px;
     cursor: pointer;
-    padding: 5px;
-    font-size: 1.1rem;
+    transition: background-color 0.3s ease;
 }
 
-li:hover {
-    background-color: #f0f0f0;
+#track-list li:hover {
+    background-color: #33445c;
 }
 
-/* Audio Player */
-.audio-player {
-    text-align: center;
+/* Player Styling */
+.player {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
     margin-top: 20px;
-}
-
-.player-controls {
-    margin-bottom: 10px;
 }
 
 button {
-    margin: 5px;
-    padding: 10px 20px;
-    font-size: 1rem;
-    background-color: #333;
-    color: #fff;
+    background-color: #1a2332;
+    color: white;
     border: none;
+    padding: 10px;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #444;
-}
-
-.progress-container {
-    margin-top: 10px;
-    font-size: 1.1rem;
+    background-color: #33445c;
 }
 
 #seek-bar {
-    width: 100%;
-    margin-top: 5px;
-}
-
-#current-time, #duration {
-    font-weight: bold;
-}
-
-/* Playlist Manager */
-.playlist-manager {
-    text-align: center;
-    margin: 20px;
-}
-
-#playlists {
-    margin-top: 10px;
-}
-
-#new-playlist {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 1.1rem;
-    background-color: #333;
-    color: white;
+    width: 200px;
+    background-color: #1a2332;
     border: none;
-    border-radius: 5px;
+    height: 10px;
     cursor: pointer;
 }
 
-#new-playlist:hover {
-    background-color: #444;
+#seek-bar::-webkit-slider-runnable-track {
+    background: #33445c;
+}
+
+#seek-bar::-webkit-slider-thumb {
+    background: #1a2332;
+    border-radius: 10px;
+}
+
+#seek-bar:focus {
+    outline: none;
+}
+
+#current-time, #duration {
+    color: #aaa;
+    font-size: 1rem;
+}
+
+/* Playlist Section */
+.playlist-manager, .track-manager {
+    margin-top: 30px;
+    padding: 0 20px;
+}
+
+h2 {
+    font-size: 1.5rem;
+    color: #ddd;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+button#new-playlist {
+    padding: 10px 20px;
+    background-color: #33445c;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+button#new-playlist:hover {
+    background-color: #1a2332;
 }
