@@ -33,8 +33,8 @@ header {
 
 /* Logo */
 header #logo {
-    width: 60px; /* Adjust logo size */
-    height: 60px; /* Force square dimensions */
+    width: 40px; /* Adjust logo size */
+    height: 40px; /* Force square dimensions */
     border-radius: 15px; /* Rounded square */
     overflow: hidden;
     cursor: pointer;
@@ -49,7 +49,7 @@ header #logo:hover {
 
 /* Header Title */
 header h1 {
-    font-size: 2.5rem;
+    font-size: 2rem; /* Adjust font size */
     color: #fff;
 }
 
@@ -167,48 +167,7 @@ main {
     color: #060c21; /* Dark text on hover */
 }
 
-/* Responsive Design for Mobile */
-@media (max-width: 768px) {
-    header {
-        flex-direction: column; /* Stack logo above title */
-        align-items: center;
-        gap: 10px;
-        padding: 10px; /* Add padding to avoid overlap */
-    }
-
-    header #logo {
-        width: 50px; /* Smaller logo on mobile */
-        height: 50px;
-        margin-bottom: 10px; /* Add space below the logo */
-    }
-
-    header h1 {
-        font-size: 1.8rem; /* Slightly smaller font for header title */
-    }
-
-    .album-card {
-        padding: 10px;
-    }
-
-    .album-card h3 {
-        font-size: 1rem;
-    }
-
-    .audio-player {
-        max-width: 90%;
-    }
-
-    .audio-player .player-controls button {
-        font-size: 18px;
-        padding: 8px;
-    }
-
-    .track-list button {
-        font-size: 0.9rem;
-        padding: 8px 16px;
-    }
-}
-/* Playlist Container */
+/* Playlist Styling */
 .playlist-container {
     margin-top: 30px;
     width: 100%;
@@ -220,14 +179,12 @@ main {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
-/* Playlist Title */
 .playlist-container h2 {
     font-size: 1.5rem;
     color: #b0c4de; /* Lighter text for playlist title */
     margin-bottom: 15px;
 }
 
-/* Playlist List */
 .playlist-list {
     list-style: none;
     padding: 0;
@@ -237,7 +194,6 @@ main {
     gap: 10px;
 }
 
-/* Playlist List Item */
 .playlist-item {
     background-color: #444; /* Darker background for playlist items */
     border: none;
@@ -255,7 +211,6 @@ main {
     color: #060c21; /* Dark text on hover */
 }
 
-/* Add/Remove Playlist Buttons */
 .playlist-controls {
     margin-top: 15px;
     display: flex;
@@ -303,12 +258,48 @@ main {
     color: #060c21; /* Dark text on hover */
 }
 
-/* Responsive Design for Playlist */
+/* Mobile Styles */
 @media (max-width: 768px) {
-    .playlist-container {
+    header {
+        flex-direction: column; /* Stack logo above title */
+        align-items: center;
+        gap: 10px;
+        padding: 10px; /* Add padding to avoid overlap */
+    }
+
+    header #logo {
+        width: 40px; /* Smaller logo on mobile */
+        height: 40px;
+        margin-bottom: 10px; /* Add space below the logo */
+    }
+
+    header h1 {
+        font-size: 1.8rem; /* Slightly smaller font for header title */
+    }
+
+    .album-card {
+        padding: 10px;
+    }
+
+    .album-card h3 {
+        font-size: 1rem;
+    }
+
+    .audio-player {
         max-width: 90%;
     }
 
+    .audio-player .player-controls button {
+        font-size: 18px;
+        padding: 8px;
+    }
+
+    .track-list button {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+    }
+
+    /* Adjust Playlist and Track Button Sizes */
     .playlist-item {
         font-size: 0.9rem;
         padding: 8px 12px;
