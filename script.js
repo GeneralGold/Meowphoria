@@ -1,18 +1,20 @@
+// Wait until the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
+    const audioPlayer = document.getElementById('audio-player');
+    const currentTrackDisplay = document.getElementById('current-track');
+    const trackListContainer = document.querySelector('.track-list');
+    const queueList = document.getElementById('queue-list');
+    const savePlaylistButton = document.getElementById('save-playlist');
+    const loadPlaylistButton = document.getElementById('load-playlist');
+    let currentTrackIndex = -1;
+    let currentAlbumTracks = [];
+    let queue = [];
+
     // Fetch the playlist.json file to get album data
     fetch('playlist.json')
         .then(response => response.json())
         .then(data => {
             const albumsContainer = document.getElementById('albums');
-            const audioPlayer = document.getElementById('audio-player');
-            const currentTrackDisplay = document.getElementById('current-track');
-            const trackListContainer = document.querySelector('.track-list');
-            const queueList = document.getElementById('queue-list');
-            const shuffleButton = document.getElementById('shuffle-btn');
-            let currentTrackIndex = -1;
-            let currentAlbumTracks = [];
-            let queue = [];
-            let isShuffled = false;
 
             // Create an album card for each album in the playlist
             Object.keys(data).forEach(albumName => {
@@ -45,62 +47,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 currentAlbumTracks.forEach((track, index) => {
                     const trackButton = document.createElement('button');
                     trackButton.textContent = track.name;
-                    trackButton.addEventListener('click', () => addToQueue(track));
+                    trackButton.addEventListener('click', () => playTrack(index));
                     trackListContainer.appendChild(trackButton);
                 });
             }
 
-            // Function to add a track to the queue
-            function addToQueue(track) {
-                queue.push(track);
-                renderQueue();
-            }
+            // Function to play a track by its index
+            function playTrack(index) {
+                if (index < 0 || index >= currentAlbumTracks.length) return;
 
-            // Function to render the queue in the queue section
-            function renderQueue() {
-                queueList.innerHTML = '';
-                queue.forEach((track, index) => {
-                    const li = document.createElement('li');
-                    li.textContent = track.name;
-                    const removeBtn = document.createElement('button');
-                    removeBtn.textContent = 'Remove';
-                    removeBtn.addEventListener('click', () => removeFromQueue(index));
-                    li.appendChild(removeBtn);
-                    if (index === 0 && !audioPlayer.paused) {
-                        li.classList.add('playing');
-                    }
-                    queueList.appendChild(li);
-                });
-            }
-
-            // Function to remove a track from the queue
-            function removeFromQueue(index) {
-                queue.splice(index, 1);
-                renderQueue();
-                if (index === 0 && !audioPlayer.paused) {
-                    playNext();
-                }
-            }
-
-            // Function to shuffle the queue
-            function shuffleQueue() {
-                for (let i = queue.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [queue[i], queue[j]] = [queue[j], queue[i]];
-                }
-                isShuffled = true;
-                renderQueue();
-            }
-
-            // Play the next track in the queue
-            function playNext() {
-                if (queue.length > 0) {
-                    const track = queue.shift();
-                    currentTrackDisplay.textContent = track.name;
-                    audioPlayer.src = track.audioURL;
-                    audioPlayer.play();
-                    renderQueue();
-                }
+                currentTrackIndex = index;
+                audioPlayer.src = currentAlbumTracks[currentTrackIndex].audioURL;
+                currentTrackDisplay.textContent = currentAlbumTracks[currentTrackIndex].name;
+                audioPlayer.play();
             }
 
             // Add event listeners for next and previous track buttons
@@ -110,11 +69,59 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
 
-            document.getElementById('next-track').addEventListener('click', playNext);
+            document.getElementById('next-track').addEventListener('click', () => {
+                if (currentTrackIndex < currentAlbumTracks.length - 1) {
+                    playTrack(currentTrackIndex + 1);
+                }
+            });
 
-            shuffleButton.addEventListener('click', shuffleQueue);
+            // Save the queue to local storage
+            savePlaylistButton.addEventListener('click', () => {
+                if (queue.length > 0) {
+                    localStorage.setItem('playlist', JSON.stringify(queue));
+                    alert('Playlist saved!');
+                } else {
+                    alert('Queue is empty, cannot save.');
+                }
+            });
 
-            audioPlayer.addEventListener('ended', playNext);
+            // Load a saved playlist from local storage
+            loadPlaylistButton.addEventListener('click', () => {
+                const savedPlaylist = localStorage.getItem('playlist');
+                if (savedPlaylist) {
+                    queue = JSON.parse(savedPlaylist);
+                    updateQueueDisplay();
+                    alert('Playlist loaded!');
+                } else {
+                    alert('No saved playlist found.');
+                }
+            });
+
+            // Add tracks to the queue
+            function addToQueue(track) {
+                queue.push(track);
+                updateQueueDisplay();
+            }
+
+            // Display the queue
+            function updateQueueDisplay() {
+                queueList.innerHTML = '';
+                queue.forEach((track, index) => {
+                    const queueItem = document.createElement('li');
+                    queueItem.textContent = track.name;
+                    queueItem.classList.toggle('playing', index === currentTrackIndex);
+                    queueList.appendChild(queueItem);
+                });
+            }
+
+            // Add track to the queue on track button click
+            trackListContainer.addEventListener('click', event => {
+                if (event.target.tagName === 'BUTTON') {
+                    const trackName = event.target.textContent;
+                    const track = currentAlbumTracks.find(t => t.name === trackName);
+                    addToQueue(track);
+                }
+            });
         })
         .catch(error => {
             console.error("Error loading playlist:", error);
