@@ -124,13 +124,11 @@
             "Take Five.mp3",
             "yes, and\uff1f.mp3",
             "The Shapeshifters - Lola's Theme (OFFICIAL VIDEO).mp3",
-            "S & M Remix.mp3",
             "Standy & Marc Korn - You Spin Me Round (Like A Record).mp3",
             "Heads Will Roll.mp3",
             "Voulez-Vous.mp3",
             "We Got the Moves.mp3",
             "Makeba (Ian Asher Remix).mp3",
-            "Scream & Shout.mp3",
             "Lone Digger.mp3",
             "Perfect (Exceeder).mp3",
             "Thriller (Steve Aoki Midnight Hour Remix).mp3",
@@ -142,11 +140,17 @@
             "Don't Stop Movin'.mp3",
             "Rush.mp3",
             "Cure For Me.mp3",
-            "Only Girl (In The World).mp3",
             "Feel It Still.mp3",
             "Losing It.mp3"
         ],
         "cover": "default-cover.jpg"
+    },
+    "Rihanna": {
+        "tracks": [
+            "S & M Remix.mp3",
+            "Only Girl (In The World).mp3"
+        ],
+        "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/9f/2a/ed/9f2aed07-2490-2e3a-e795-d48b71962eaa/075679951601.jpg/100x100bb.jpg"
     },
     "Chappell Roan": {
         "tracks": [
@@ -169,6 +173,7 @@
         "tracks": [
             "Baby One More Time (from Kung Fu Panda 4).mp3",
             "Womanizer.mp3",
+            "Scream & Shout.mp3",
             "Baby One More Time.mp3",
             "Oops!... I Did It Again.mp3",
             "Toxic.mp3"
