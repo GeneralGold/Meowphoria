@@ -91,8 +91,8 @@ main {
 
 .album-card img {
     width: 100%;
-    height: 250px;
-    object-fit: cover;
+    height: 100%; /* Make the album cover a square */
+    object-fit: cover; /* Ensure the image covers the entire area without distortion */
     transition: transform 0.3s ease;
 }
 
