@@ -47,6 +47,19 @@
         ],
         "cover": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/c8/d3/42/c8d342af-26d9-3ec2-c511-e1eaf860e299/13UABIM57787.rgb.jpg/100x100bb.jpg"
     },
+    "Minecraft Championship": {
+        "tracks": [
+            "To Get to the Other Side and Whack a Fan.mp3",
+            "Overtime.mp3",
+            "One Minute to MCC!.mp3",
+            "Ace Race.mp3",
+            "Dodgebolt.mp3",
+            "Decision Dome.mp3",
+            "The Final Duel!.mp3",
+            "Rocket Spleef Rush.mp3"
+        ],
+        "cover": "images/mcc.jpg"
+    },
     "Sabaton": {
         "tracks": [
             "The Last Battle.mp3",
