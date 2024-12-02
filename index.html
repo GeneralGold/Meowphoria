@@ -9,7 +9,6 @@
 <body>
     <!-- Header with Logo and Title -->
     <header>
-        <!-- Logo with hover effect and link to the external website -->
         <a href="https://generalgoldyt.com" target="_blank">
             <img id="logo" src="https://generalgoldyt.com/webhook/GeneralGoldLogo.png" alt="General Gold Logo">
         </a>
@@ -27,6 +26,7 @@
                 <button id="prev-track">⏪</button>
                 <span id="current-track">Select a track</span>
                 <button id="next-track">⏩</button>
+                <button id="shuffle-btn">Shuffle</button> <!-- Shuffle Button -->
             </div>
             <div class="audio-container">
                 <audio id="audio-player" controls></audio>
@@ -36,16 +36,11 @@
                     <!-- Track buttons will be dynamically populated here -->
                 </div>
             </div>
-        </section>
-
-        <!-- Queue Section -->
-        <section id="queue-section">
-            <h2>Queue</h2>
-            <ul id="queue-list">
-                <!-- Queue items will be displayed here -->
-            </ul>
-            <button id="save-playlist">Save Playlist</button>
-            <button id="load-playlist">Load Playlist</button>
+            <!-- Queue Display -->
+            <div id="queue-section">
+                <h3>Queue</h3>
+                <ul id="queue-list"></ul> <!-- Queue list -->
+            </div>
         </section>
     </main>
 
