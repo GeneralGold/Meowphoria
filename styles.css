@@ -173,15 +173,17 @@ main {
         flex-direction: column; /* Stack logo above title */
         align-items: center;
         gap: 10px;
+        padding: 10px; /* Add padding to avoid overlap */
     }
 
     header #logo {
         width: 50px; /* Smaller logo on mobile */
         height: 50px;
+        margin-bottom: 10px; /* Add space below the logo */
     }
 
     header h1 {
-        font-size: 2rem;
+        font-size: 1.8rem; /* Slightly smaller font for header title */
     }
 
     .album-card {
