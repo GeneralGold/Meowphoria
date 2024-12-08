@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const trackListContainer = document.querySelector('.track-list');
             const queueList = document.getElementById('queue-list');
             const shuffleButton = document.getElementById('shuffle-btn');
-            let currentTrackIndex = -1; // Keeps track of the currently playing track
+            let currentTrackIndex = -1;
             let currentAlbumTracks = [];
             let queue = [];
             let isShuffled = false;
@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     removeBtn.textContent = 'Remove';
                     removeBtn.addEventListener('click', () => removeFromQueue(index));
                     li.appendChild(removeBtn);
-                    if (index === currentTrackIndex) {
+                    if (index === 0 && !audioPlayer.paused) {
                         li.classList.add('playing');
                     }
                     queueList.appendChild(li);
@@ -82,10 +82,10 @@ document.addEventListener("DOMContentLoaded", () => {
             // Function to remove a track from the queue
             function removeFromQueue(index) {
                 queue.splice(index, 1);
-                if (index === currentTrackIndex) {
-                    currentTrackIndex = Math.max(0, currentTrackIndex - 1);
-                }
                 renderQueue();
+                if (index === 0 && !audioPlayer.paused) {
+                    playNext();
+                }
             }
 
             // Function to shuffle the queue
@@ -98,11 +98,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 renderQueue();
             }
 
-            // Play the next track in the queue without removing it
+            // Play the next track in the queue
             function playNext() {
                 if (queue.length > 0) {
-                    currentTrackIndex = (currentTrackIndex + 1) % queue.length;
-                    const track = queue[currentTrackIndex];
+                    const track = queue.shift();
                     currentTrackDisplay.textContent = track.name;
                     audioPlayer.src = track.audioURL;
                     audioPlayer.play();
@@ -110,34 +109,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
 
-            // Play the previous track in the queue
-            function playPrevious() {
-                if (queue.length > 0) {
-                    currentTrackIndex = (currentTrackIndex - 1 + queue.length) % queue.length;
-                    const track = queue[currentTrackIndex];
-                    currentTrackDisplay.textContent = track.name;
-                    audioPlayer.src = track.audioURL;
-                    audioPlayer.play();
-                    renderQueue();
-                }
-            }
-
-            // Play button logic
-            document.getElementById('play-button').addEventListener('click', () => {
-                if (!audioPlayer.src && queue.length > 0) {
-                    playNext();
-                } else {
-                    audioPlayer.play();
+            // Add event listeners for next and previous track buttons
+            document.getElementById('prev-track').addEventListener('click', () => {
+                if (currentTrackIndex > 0) {
+                    playTrack(currentTrackIndex - 1);
                 }
             });
 
-            // Add event listeners for next and previous track buttons
-            document.getElementById('prev-track').addEventListener('click', playPrevious);
             document.getElementById('next-track').addEventListener('click', playNext);
 
             shuffleButton.addEventListener('click', shuffleQueue);
 
-            // Automatically play the next track when the current one ends
             audioPlayer.addEventListener('ended', playNext);
         })
         .catch(error => {
